@@ -1,0 +1,57 @@
+{
+    "name": "rguezque/skeleton-project-katya-router",
+    "description": "Skeleton para proyectos, utilizando katya-router",
+    "type": "project",
+    "require": {
+        "rguezque/katya-router": "^2.0",
+        "vlucas/phpdotenv": "^5.6",
+        "firebase/php-jwt": "^6.11"
+    },
+    "require-dev": {
+        "twbs/bootstrap": "^5.3",
+        "components/font-awesome": "^6.5"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Project\\App\\": "app/"
+        },
+        "files": [
+            "bootstrap/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Luis Arturo Rodríguez",
+            "role": "Original Developer",
+            "homepage": "https://github.com/rguezque",
+            "email": "rguezque@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "scripts": {
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S localhost:8000 -t public"
+        ],
+        "post-install-cmd": [
+            "@cp-assets", 
+            "cp ./.env.example ./.env",
+            "composer dump-autoload -o"
+        ],
+        "cp-assets": [
+            "cp ./vendor/twbs/bootstrap/dist/css/bootstrap.min.css public/static/css/bootstrap",
+            "cp ./vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js public/static/js/bootstrap",
+            "cp ./vendor/components/font-awesome/css/all.min.css public/static/css/fontawesome/css",
+            "cp -R ./vendor/components/font-awesome/webfonts public/static/css/fontawesome/webfonts"
+        ],
+        "rm-assets": [
+            "rm -rf public/static/css/bootstrap/bootstrap.min.css",
+            "rm -rf public/static/css/fontawesome/css/all.min.css",
+            "rm -rf public/static/css/fontawesome/webfonts",
+            "rm -rf public/static/js/alpine/alpine.min.js",
+            "rm -rf public/static/js/axios/axios.min.js",
+            "rm -rf public/static/js/bootstrap/bootstrap.bundle.min.js"
+        ]
+    }
+}

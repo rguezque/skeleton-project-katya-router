@@ -1,0 +1,12 @@
+/* filepath: /public/static/css */
+
+/* From CDN */
+/* @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"); */
+
+/* From local third party libraries */
+@import "./bootstrap/bootstrap.min.css";
+@import "./fontawesome/css/all.min.css";
+
+body {
+    font-family:Arial, Helvetica, sans-serif;
+}
