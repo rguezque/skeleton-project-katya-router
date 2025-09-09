@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 use Dotenv\Dotenv;
-use Project\App\Config\App;
+use Project\Core\App;
 use rguezque\Environment;
 
 // Manejo de errores

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 use Project\App\Controllers\DashboardController;
-use Project\App\Config\App;
+use Project\Core\App;
 use rguezque\Request;
 use rguezque\Response;
 use rguezque\Services;

@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 
-use Project\App\Config\App;
+use Project\Core\App;
+use Project\Core\i18n;
 
 if(!function_exists('url')) {
     /**
@@ -13,6 +14,19 @@ if(!function_exists('url')) {
         $path = DIRECTORY_SEPARATOR . trim($path, '/\\'); // Asegura que la ruta sea relativa al basepath
         $baseurl = App::getBaseUrl();
         return $baseurl . htmlspecialchars($path, ENT_QUOTES);
+    }
+}
+
+if(!function_exists('i18n')) {
+    /**
+     * Obtiene una traducción por su clave. Si no existe, se devuelve el string de la clave.
+     * Esta función es un atajo para recuperar traducciones previamente cargadas por la clase Pressmark\App\Config\i18n
+     * 
+     * @param string $key La clave de la traducción
+     * @return string La palabra traducida
+     */
+    function i18n(string $key) {
+        return i18n::get($key);
     }
 }
 
@@ -111,6 +125,22 @@ if(!function_exists('metatag')) {
         }
 
         return "<meta{$html_attributes}>";
+    }
+}
+
+if(!function_exists('pipe')) {
+    /**
+     * Devuelve el resultado de ejecutar una secuencia de funciones en pipeline sobre un valor específico.
+     * Ej. `pipe('strtolower', 'ucwords', 'trim')('  jOHn dOE  ')` devuelve 'John Doe'
+     * 
+     * @param array<Closure> $fns Listado de funciones a ejecutar en cadena
+     * @return mixed El resultado de aplicar las funciones sobre un valor
+     */
+    function pipe(...$fns) {
+        return fn($initial_value) => 
+            array_reduce($fns, function($accumulator, $func) {
+                return call_user_func($func, $accumulator);
+            }, $initial_value);
     }
 }
 

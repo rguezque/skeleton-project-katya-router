@@ -14,10 +14,11 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Project\\App\\": "app/"
+            "Project\\App\\": "app/",
+            "Project\\Core\\": "src/"
         },
         "files": [
-            "bootstrap/helpers.php"
+            "src/functions/helpers.php"
         ]
     },
     "authors": [

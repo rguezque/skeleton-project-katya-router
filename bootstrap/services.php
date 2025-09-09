@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-use Project\App\Config\App;
+use Project\Core\App;
 use rguezque\Services;
 use rguezque\ViewEngine;
 

@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Project\App\Config;
+namespace Project\Core;
 
-use rguezque\Exceptions\NotFoundException;
+use rguezque\Exceptions\FileNotFoundException;
 
 class i18n {
 
@@ -71,7 +71,7 @@ class i18n {
         $file = rtrim($path, '/\\') . DIRECTORY_SEPARATOR . self::$lang . '.json';
 
         if(!file_exists($file)) {
-            throw new NotFoundException(sprintf('No se encontró el archivo especificado en: "%s"', $file));
+            throw new FileNotFoundException(sprintf('No se encontró el archivo especificado en: "%s"', $file));
         }
 
         $json = file_get_contents($file);

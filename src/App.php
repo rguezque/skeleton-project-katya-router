@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Project\App\Config;
+namespace Project\Core;
 
 use rguezque\CorsConfig;
 use rguezque\Katya;
