@@ -36,7 +36,8 @@ class i18n {
      * @return void
      */
     public static function configure(string $lang = 'es', string $path = 'i18n/', bool $load2globals = false): void {
-        self::$lang = self::detectBrowserLanguage(strtolower(trim($lang)));
+        $lang = pipe('trim', 'strtolower')($lang);
+        self::$lang = self::detectBrowserLanguage($lang);
         self::$translations = self::loadTranslations($path);
         self::$load2globals = $load2globals;
         if($load2globals) {

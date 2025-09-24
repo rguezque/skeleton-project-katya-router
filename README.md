@@ -18,6 +18,7 @@
     - [Configurar Vite](#configurar-vite)
 - [Servidor de prueba](#servidor-de-prueba)
 - [Producción](#producción)
+- [i18n](#i18n)
 
 ---
 
@@ -53,6 +54,10 @@ Y en `app.module.js`:
 // filepath: /public/static/js/app.module.js
 import 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js'
 ```
+
+>[!NOTE]
+>- Para usar los estilos de Bootstrap: Solo necesitas `bootstrap.min.css`.
+>- Para usar las funcionalidades interactivas de Bootstrap: Necesitas `bootstrap.bundle.min.js` (además de `bootstrap.min.css`) que ya incluye la dependencia `Popper.js`.
 
 #### Font Awesome
 
@@ -194,3 +199,46 @@ Ejecuta en la terminal:
 composer install --no-dev
 ```
 
+## i18n
+
+Configura la internacionalización en el archivo `bootstrap/app.php` y coloca los archivos JSON con las traducciones en el directorio `i18n/`. Los archivos de traducción deben nombrase con los dos primeros caracteres del idioma. Ej. `es`, `en`, etc.
+
+El método `i18n::configure` detectará automáticamente el idioma del navegador, sin embargo se cargará por default el idioma español `es` en caso de que por algún motivo no sea detectado. Puedes cambiar el idioma default enviandolo como primer argumento.
+
+```php
+use Project\Core\i18n;
+
+// En este caso se cargara el idioma inglés en caso de que no se pueda detectar el idioma nativo del navegador web
+i18n::configure(lang: 'en', path: __DIR__.'/i18n');
+```
+
+A partir de aquí se puede acceder a la función `i18n()` en las vistas; de esta forma se accede a las claves con las traducción correspondiente.
+
+```json
+{
+    "title": "Mi aplicación",
+    "description": "Bienvenido al sistema."
+}
+```
+
+En un archivo de vista se carga la traducción así:
+
+```php
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <title><?= i18n('title'); ?></title>
+</head>
+
+<body>
+    <?= i18n('description'); ?>
+</body>
+
+</html>
+```
+
+
+
+> [!IMPORTANT]
+> Los archivos de idioma que se espera que se detecten automáticamente deben existir obligatoriamente. Para cualquier otro idioma que no se espera ofrecer soporte, el archivo de idioma default también debe existir.

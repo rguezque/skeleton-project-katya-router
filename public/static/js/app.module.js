@@ -12,7 +12,7 @@ import './alpine/alpine.min.js';
 import './bootstrap/bootstrap.bundle.min.js';
 
 // custom modules
-import { getCookie } from './utils.js';
+import { getCookie } from './utils.module.js';
 
 // Crea una instancia de Axios y configura la URL base para las peticiones a la API
 const api = axios.create({
