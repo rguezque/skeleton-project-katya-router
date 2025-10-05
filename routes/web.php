@@ -2,6 +2,7 @@
 
 use Project\App\Controllers\DashboardController;
 use Project\Core\App;
+use rguezque\HtmlResponse;
 use rguezque\Request;
 use rguezque\Response;
 use rguezque\Services;
@@ -9,10 +10,9 @@ use rguezque\Services;
 $app = App::getApplication();
 
 $app->get('/', [DashboardController::class, 'homeAction']);
-$app->get('/home/test', [DashboardController::class, 'homeAction']);
-
 $app->get('/info', function(Request $request, Services $services) {
-    return new Response(App::getBaseUrl());
+    $view = $services->view->fetch('phpinfo');
+    return new HtmlResponse($view);
 });
 
 return $app;
