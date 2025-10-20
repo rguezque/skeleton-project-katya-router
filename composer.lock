@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c02a64100a466e6f1447dc09c0156e61",
+    "content-hash": "a847f70eb9cb889c2c222f453535eced",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -212,12 +212,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rguezque/katya-router.git",
-                "reference": "e52ecfe970b4aa1dbd4bc5812e4172db76d99b4a"
+                "reference": "f0b7d93301345c431ee0499b54fd19430d488330"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rguezque/katya-router/zipball/e52ecfe970b4aa1dbd4bc5812e4172db76d99b4a",
-                "reference": "e52ecfe970b4aa1dbd4bc5812e4172db76d99b4a",
+                "url": "https://api.github.com/repos/rguezque/katya-router/zipball/f0b7d93301345c431ee0499b54fd19430d488330",
+                "reference": "f0b7d93301345c431ee0499b54fd19430d488330",
                 "shasum": ""
             },
             "require": {
@@ -226,7 +226,7 @@
             "type": "router",
             "autoload": {
                 "files": [
-                    "src/functions/functions.php"
+                    "src/functions/helpers.php"
                 ],
                 "psr-4": {
                     "rguezque\\": "src/"
@@ -257,7 +257,7 @@
                 "issues": "https://github.com/rguezque/katya-router/issues",
                 "source": "https://github.com/rguezque/katya-router/tree/v2.0.0"
             },
-            "time": "2025-09-01T19:10:49+00:00"
+            "time": "2025-10-11T05:33:28+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -688,7 +688,7 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "alpha",
+    "minimum-stability": "stable",
     "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,

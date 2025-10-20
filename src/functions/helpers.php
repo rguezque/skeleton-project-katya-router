@@ -2,6 +2,10 @@
 
 use Project\Core\App;
 use Project\Core\i18n;
+use rguezque\Parameters;
+use rguezque\Session;
+
+use function rguezque\functions\env as get_env_var;
 
 if(!function_exists('url')) {
     /**
@@ -81,12 +85,11 @@ if(!function_exists('env')) {
      * 
      * @param string $key La clave de la variable de entorno.
      * @param mixed $default (Opcional) Valor por defecto si la variable no está definida.
+     * @param int $cast_to Número entero que identifica el tipo de casteo a aplicar a la variable
      * @return mixed El valor de la variable de entorno o el valor por defecto.
      */
-    function env(string $key, mixed $default = null): mixed {
-        $key = str_replace(['.', '-'], '_', strtoupper($key));
-        $value = $_ENV[$key] ?? false;
-        return ($value === false) ? $default : $value;
+    function env(string $key, mixed $default = null, ?int $cast_to = null): mixed {
+        return get_env_var($key, $default, $cast_to);
     }
 }
 
@@ -141,6 +144,98 @@ if(!function_exists('pipe')) {
             array_reduce($fns, function($accumulator, $func) {
                 return call_user_func($func, $accumulator);
             }, $initial_value);
+    }
+}
+
+if(!function_exists('sanitize_input')) {
+    /**
+     * Sanitiza recursivamente un valor o un arreglo de valores.
+     *
+     * Aplica el filtro FILTER_SANITIZE_FULL_SPECIAL_CHARS para codificar
+     * caracteres especiales HTML y prevenir ataques XSS.
+     *
+     * @param mixed $data La variable (string o array) a sanitizar.
+     * @return mixed Los datos sanitizados.
+     */
+    function sanitize_input($data) {
+        if (is_array($data)) {
+            // Si es un arreglo, aplica la función a cada elemento.
+            return array_map('sanitize_input', $data);
+        }
+
+        if (is_string($data)) {
+            // Usa FILTER_SANITIZE_FULL_SPECIAL_CHARS para codificar caracteres especiales HTML,
+            // lo que es la principal defensa contra XSS.
+            return filter_var($data, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        }
+
+        // Devuelve otros tipos de datos (como números enteros, booleanos) sin modificar,
+        // ya que no contienen scripts.
+        return $data;
+    }
+}
+
+if(!function_exists('generate_csrf_token')) {
+    /**
+     * Genera el token CSRF, lo guarda en la sesión y lo devuelve.
+     * Si ya existe un token en la sesión, lo devuelve.
+     * 
+     * @return string El token CSRF actual.
+     */
+    function generate_csrf_token() {
+        $session = Session::create();
+        // Verifica si el token ya existe en la sesión
+        if (!$session->has('csrf_token')) {
+            // Genera un token criptográficamente seguro
+            // bin2hex convierte bytes aleatorios en una cadena hexadecimal
+            $session->set('csrf_token', bin2hex(random_bytes(32))); 
+        }
+
+        return $session->get('csrf_token');
+    }
+}
+
+if(!function_exists('csrf_field')) {
+    /**
+     * Genera el campo input hidden con el token CSRF para el formulario.
+     * 
+     * @return void Imprime directamente el campo HTML.
+     */
+    function csrf_field() {
+        $token = generate_csrf_token();
+        // Usa htmlspecialchars para asegurar que el token se imprima de forma segura
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token) . '">';
+    }
+}
+
+if(!function_exists('validate_csrf_token')) {
+    /**
+     * Valida el token enviado en la solicitud (`$_POST` o `$_GET`) contra el token de la sesión.
+     * 
+     * @param Parameters $request El objeto de la solicitud. Normalmente `$_POST` (`Request::getBody()`) o `$_GET` (`Request::getQuery()`).
+     * @return bool True si el token es válido, false si no lo es o falta.
+     */
+    function validate_csrf_token(Parameters $request) {
+        $session = Session::create();
+        // 1. Verificar que el token de la sesión existe
+        if (!$session->valid('csrf_token')) {
+            return false; // No hay token de sesión para validar
+        }
+        
+        // 2. Verificar que el token de la solicitud existe
+        if (!$request->valid('csrf_token')) {
+            return false; // El formulario no envió el token
+        }
+    
+        // 3. Comparar de forma segura
+        // hash_equals previene ataques de sincronización (timing attacks)
+        if (hash_equals($session->get('csrf_token'), $request->get('csrf_token'))) {
+            // Opcional y recomendado: Consumir el token después de usarlo
+            $session->remove('csrf_token'); 
+            return true;
+        }
+        
+        return false; // Los tokens no coinciden
     }
 }
 

@@ -10,7 +10,7 @@ use rguezque\Services;
 $app = App::getApplication();
 
 $app->get('/', [DashboardController::class, 'homeAction']);
-$app->get('/info', function(Request $request, Services $services) {
+$app->get('/info', function(Request $request, Services $services): Response {
     $view = $services->view->fetch('phpinfo');
     return new HtmlResponse($view);
 });
