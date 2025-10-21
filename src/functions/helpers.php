@@ -49,7 +49,7 @@ if(!function_exists('resources')) {
         }
 
         $manifest_path = App::getBasePath() . '/public/compiled/.vite/manifest.json';
-        if('production' == env('app.env') && file_exists($manifest_path)) {
+        if('production' == env('APP_ENV') && file_exists($manifest_path)) {
             $manifest = json_decode(file_get_contents($manifest_path), true);
 
             if (json_last_error() === JSON_ERROR_NONE && is_array($manifest)) {
@@ -81,7 +81,6 @@ if(!function_exists('resources')) {
 if(!function_exists('env')) {
     /**
      * Obtiene el valor de una variable de entorno. Si la variable no está definida, devuelve el valor por defecto proporcionado.
-     * La variable se invoca en minúsculas y con puntos en vez de los guiones bajos (si los tiene). Ej: app.name en vez de APP_NAME
      * 
      * @param string $key La clave de la variable de entorno.
      * @param mixed $default (Opcional) Valor por defecto si la variable no está definida.

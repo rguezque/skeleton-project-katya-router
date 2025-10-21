@@ -3,7 +3,7 @@
 
 <head>
     <?= metadata(); ?>
-    <title><?= env('app.name') ?></title>
+    <title><?= env('APP_NAME') ?></title>
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png">

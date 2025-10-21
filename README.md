@@ -238,7 +238,5 @@ En un archivo de vista se carga la traducción así:
 </html>
 ```
 
-
-
 > [!IMPORTANT]
 > Los archivos de idioma que se espera que se detecten automáticamente deben existir obligatoriamente. Para cualquier otro idioma que no se espera ofrecer soporte, el archivo de idioma default también debe existir.
