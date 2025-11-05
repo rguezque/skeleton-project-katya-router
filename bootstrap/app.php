@@ -2,11 +2,17 @@
 
 use Dotenv\Dotenv;
 use Project\Core\App;
+use Project\Core\VisitorsLogger;
 use rguezque\Environment;
+
+date_default_timezone_set('America/Mexico_City');
 
 // Manejo de errores
 Environment::register();
 Environment::setLogPath(dirname(__DIR__) . '/logs');
+
+$logger = new VisitorsLogger(dirname(__DIR__) . '/logs/visitors');
+$logger->logAccess();
 
 // Carga de las variables de entorno desde el archivo .env
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));

@@ -24,5 +24,7 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-Order Deny,Allow
-Deny from all
+<FilesMatch "\.(env|json|log|yaml|yml|xml|ini|phar|sh|sql|sqlite|sqlite3)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
