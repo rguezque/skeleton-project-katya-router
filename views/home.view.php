@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="light">
+<html lang="<?= env('APP_LANG') ?>" data-bs-theme="light">
 
 <head>
     <?= metadata(); ?>

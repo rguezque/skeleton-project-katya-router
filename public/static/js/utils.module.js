@@ -1,4 +1,13 @@
 /**
+ * Ejecuta un callback después de cargarse todos los elementos del DOM
+ * 
+ * @param {function} fn Callback a ejecutar
+ */
+function onDocumentReady(fn) {
+    document.addEventListener('DOMContentLoaded', fn);
+}
+
+/**
  * Crea una cookie
  * 
  * @param {string} name Nombre de la cookie
@@ -233,6 +242,7 @@ export {
     getCookie, 
     isNull,
     isUndefined,
+    onDocumentReady,
     removeLeadingSlashes,
     removeTrailingSlashes,
     setCookie,
