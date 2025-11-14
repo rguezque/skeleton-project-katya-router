@@ -1,9 +1,11 @@
 {
   "devDependencies": {
     "alpinejs": "^3.14.9",
-    "axios": "^1.11.0"
+    "axios": "^1.11.0",
+    "vite": "^7.2.2"
   },
     "scripts": {
+        "build": "vite build",
         "postinstall": "npm run cp-assets",
         "cp-assets": "cp ./node_modules/axios/dist/axios.min.js public/static/js/axios & cp ./node_modules/alpinejs/dist/cdn.min.js public/static/js/alpine/alpine.min.js"
     }
