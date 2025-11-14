@@ -213,7 +213,7 @@ Environment::setLogPath(dirname(__DIR__) . '/logs');
 
 Para los bloques `try-catch` utiliza `Environment::handleException` en el `catch`, de esta forma los logs se guardarán con información detallada, pero el mensaje mostrado al usuario cambiará dependiendo del entorno de desarrollo; en `development` mostrará todo el *trace string* mientras que en `production` solo mostrará un error `500 Internal Error Server`.
 
-Consulta el [`README.md`](./vendor/rguezque/katya-router/README.md#environment-management) del router para más información.
+Consulta el [`README.md`](https://github.com/rguezque/katya-router/blob/master/README.md#environment-management) del router para más información.
 
 ## Helpers
 
@@ -231,4 +231,4 @@ Los *helpers* son funciones cargadas automáticamente al inicio y que facilitan 
 - `csrf_field()`: Genera el campo input hidden con el token CSRF para el formulario. Ej. `<form><? csrf_field() ?></form>`.
 - `validate_csrf_token(Parameters $request)`: Valida el token enviado en la solicitud (`$_POST` o `$_GET`) contra el token guardado en la sesión activa.
 
-También están disponibles los *helpers* definidos en la libreria de `katya-router`. Consulta el [`README.md`](./vendor/rguezque/katya-router/README.md#helpers) del router.
+También están disponibles los *helpers* definidos en la libreria de `katya-router`. Consulta el [`README.md`](https://github.com/rguezque/katya-router/blob/master/README.md#helpers) del router.
