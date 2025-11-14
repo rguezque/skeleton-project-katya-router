@@ -16,7 +16,6 @@
   - [NPM (JS)](#npm-(js))
     - [Configurar Axios](#configurar-axios)
     - [Configurar Alpine](#configurar-alpine)
-    - [Configurar Vite](#configurar-vite)
 - [Servidor de prueba](#servidor-de-prueba)
 - [Producción](#producción)
 - [i18n](#i18n)
@@ -35,14 +34,17 @@ Ejecuta en la terminal:
 composer install
 ```
 
-Se instalarán las dependencias de producción/desarrollo y se copiaran automáticamente los archivos necesarios dentro de `/public`. Si por algún motivo no se copian los archivos, hazlo de forma manual como se describe a continuación.
+Se instalarán las dependencias de producción/desarrollo y se copiaran automáticamente los archivos necesarios dentro de `public/`. Si por algún motivo no se copian los archivos, hazlo de forma manual como se describe a continuación.
+
+>[!IMPORTANT]
+>Para el caso de `Axios` y `Alpine`, estos se intentarán descargar desde su respectivo CDN en `cdn.jsdelivr.net`. Si llegará a fallar, intenta descargarlos desde el CDN en `unpkg.com` ejecutando en la terminal `composer run download-from-unpkg-assets`. Si todo lo anterior falla, puedes intentar descargarlos usando el gestor de paquetes NPM de NodeJS; se incluye un archivo de configuración `package.json` (Ver la sección [NPM (JS)](#npm-(js)) para más información sobre configuración para el proyecto.
 
 #### Bootstrap
 
 Copia los archivos `.css` y `.js` según el siguiente mapeo:
 
-- `vendor/twbs/bootstrap/dist/css/bootstrap.min.css`: Se copia al directorio `/public/static/css/bootstrap/`
-- `vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js`: Se copia al directorio `/public/static/js/bootstrap/`
+- `vendor/twbs/bootstrap/dist/css/bootstrap.min.css`: Se copia al directorio `public/static/css/bootstrap/`
+- `vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js`: Se copia al directorio `public/static/js/bootstrap/`
 
 También puede llamarse desde un CDN en `app.css`:
 
@@ -59,12 +61,13 @@ import 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.mi
 ```
 
 >[!NOTE]
+>
 >- Para usar los estilos de Bootstrap: Solo necesitas `bootstrap.min.css`.
 >- Para usar las funcionalidades interactivas de Bootstrap: Necesitas `bootstrap.bundle.min.js` (además de `bootstrap.min.css`) que ya incluye la dependencia `Popper.js`.
 
 #### Font Awesome
 
-Copia el archivo `.css` y el directorio `/webfonts` según el siguiente mapeo:
+Copia el archivo `.css` y el directorio `webfonts/` según el siguiente mapeo:
 
 - `vendor/components/font-awesome/css/all.min.css`: Se copia al directorio `public/static/css/fontawesome/css/`
 - `vendor/components/font-awesome/webfonts`: Se copia al directorio `public/static/css/fontawesome/`
@@ -83,7 +86,10 @@ Ejecuta en la terminal:
 npm install
 ```
 
-Se instalarán las dependencias de producción/desarrollo y se copiaran automáticamente los archivos necesarios dentro de `/public`. Si por algún motivo no se copian los archivos, hazlo de forma manual como se describe a continuación.
+Se instalarán las dependencias de producción/desarrollo y se copiaran automáticamente los archivos necesarios dentro de `public/`. Si por algún motivo no se copian los archivos, hazlo de forma manual como se describe a continuación.
+
+>[!NOTE]
+>Después de copiar las depéndencias a `public/` puedes eliminar el directorio `node_modules/`
 
 #### Configurar Axios
 
@@ -97,7 +103,7 @@ Alternativamente puede configurarse para llamarse desde un CDN en `app.module.js
 import 'https://unpkg.com/axios@1.6.7/dist/axios.min.js';
 ```
 
-Para este proyecto se aplican las siguientes configuraciones de axios en `/public/static/js/app.module.js`:
+Para este proyecto se aplican las siguientes configuraciones de axios en `public/static/js/app.module.js`:
 
 ```javascript
 // Crea una instancia de Axios y configura la URL base para las peticiones a la API
@@ -132,54 +138,6 @@ Alternativamente puede configurarse para llamarse desde un CDN en `app.module.js
 ```javascript
 import 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js';
 ```
-
-#### Configurar Vite
-
-La configuración básica del empaquetador Vite se encuentra en el archivo `vite.config.js` en la raíz del proyecto.
-
-```javascript
-// vite.config.js
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-    root: 'public',
-    base: './', 
-    build: {
-        outDir: 'compiled', 
-        rollupOptions: {
-            input: [
-                'public/static/css/app.css',
-                'public/static/js/app.module.js',
-            ],
-            output: {
-                entryFileNames: '[name].js',
-                assetFileNames: '[name].[ext]',
-                chunkFileNames: '[name].[ext]',
-            },
-        },
-    },
-});
-```
-
-Donde:
-
-- `defineConfig.root`: Es el directorio raíz donde Vite buscará por los archivos fuente a empaquetar.
-- `defineConfig.base`: Base pública para el proyecto. Es importante para archivos que referencian otros assets. Esto es útil cuando tu proyecto se despliega en una subcarpeta de un servidor.
-- `defineConfig.build.outDir`: Directorio de salida dentro de `defineConfig.root` para los archivos compilados. Si no se especifica, el valor por defecto es 'dist'.
-- `defineConfig.build.rollupOptions.input`: Se agregan los archivos que desean ser empaquetados, las rutas deben ser relativas a `defineConfig.root`.
-- `defineConfig.build.rollupOptions.output`: (Opcional) Configura los nombres de los archivos de salida dentro de `defineConfig.build.outDir`. Si no se define esta sección, el directorio por default será `/assets` dentro de `build.outDir` y los archivos tendrán nombres aleatorios.
-- `defineConfig.build.rollupOptions.output.dir`: (Opcional) Directorio de salida de los archivos compilados. Si no se define `output.dir` se tomará `build.outDir`.
-
-Configurar nombres de salida de los archivos en `defineConfig.build.rollupOptions.output`:
-
-- `output.entryFileNames`: Directorio y nombre para los archivos JS.
-- `output.assetFileNames`: Para los assets (imágenes, CSS, etc.).
-- `output.chunkFileNames`: Para los trozos de código.
-
->[!NOTE]
-> Se puede utilizar el placeholder `[name]` para conservar el nombre del archivo y combinarse con un hash `[hash]`, seguido de la extensión original `[ext]`. Ej: `[name]-[hash].[ext]`
-
-Compila los assets desde la terminal con `npx vite build`.
 
 ## Servidor de prueba
 

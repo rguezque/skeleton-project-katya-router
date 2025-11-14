@@ -49,16 +49,6 @@ if(!function_exists('resources')) {
             return; // No hay recursos que cargar
         }
 
-        $manifest_path = App::getBasePath() . '/public/compiled/.vite/manifest.json';
-        if('production' == env('APP_ENV') && file_exists($manifest_path)) {
-            $manifest = json_decode(file_get_contents($manifest_path), true);
-
-            if (json_last_error() === JSON_ERROR_NONE && is_array($manifest)) {
-                loadCompiledResources($styles, $scripts, $manifest);
-                return;
-            }
-        }
-
         $static_url = App::getStaticDirectory();
 
         foreach ($styles as $style) {
@@ -238,28 +228,5 @@ if(!function_exists('validate_csrf_token')) {
         return false; // Los tokens no coinciden
     }
 }
-
-function loadCompiledResources($styles, $scripts, $manifest) {
-    $compiled_dir = App::getBaseUrl() . '/compiled/';
-    
-    foreach($styles as $style) {
-        $style = App::getStaticDirectory() . DIRECTORY_SEPARATOR . ltrim($style, '/\\'); // Asegura que la ruta sea relativa al basepath
-        $compiled_style = $manifest[trim($style, '/\\')]['file'];
-        echo '<link rel="stylesheet" href="' . $compiled_dir . htmlspecialchars($compiled_style, ENT_QUOTES) . '">' . PHP_EOL;
-    }
-    
-    foreach($scripts as $option => $script) {
-        $script = App::getStaticDirectory() . DIRECTORY_SEPARATOR . ltrim($style, '/\\'); // Asegura que la ruta sea relativa al basepath
-        $compiled_script = $manifest[trim($style, '/\\')]['file'];
-        $is_module = preg_match('/\.module\.js$/i', $script);
-        $type_attr = $is_module ? ' type="module"' : '';
-        $attrs = ''; // Por defecto, sin atributos adicionales
-        if(!is_numeric($option)) {
-            $attrs = ' '.$option;
-        }
-        echo '<script src="' . $compiled_dir . htmlspecialchars($compiled_script, ENT_QUOTES) . '"' . $type_attr . $attrs .'></script>' . PHP_EOL;
-    }
-}
-
 
 ?>
