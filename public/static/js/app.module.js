@@ -1,4 +1,5 @@
 // filepath: /public/static/js/app.module.js
+// Aqui se definen configuraciones globales del proyecto
 
 // From CDN
 //import 'https://unpkg.com/axios@1.6.7/dist/axios.min.js';

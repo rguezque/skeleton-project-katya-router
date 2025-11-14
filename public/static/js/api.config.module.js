@@ -1,3 +1,6 @@
+// filepath: /public/static/js/api.config.module.js
+// Aqui se configura una instancia de axios para la api
+
 import { getCookie } from './utils.module.js';
 import './axios/axios.min.js';
 

@@ -1,3 +1,6 @@
+// filepath: /public/static/js/utils.module.js
+// Aqui se definen utilidades que ayudan en el desarrollo del proyecto
+
 /**
  * Ejecuta un callback después de cargarse todos los elementos del DOM
  * 
@@ -94,7 +97,7 @@ function deleteAllCookies() {
 function sizeof(obj) {
     const type = typeof obj;
 
-    if(!['object', 'array'].includes(type)) {
+    if (!['object', 'array'].includes(type)) {
         throw new Error(`The argument must be type "object" javascript, or "array". Catched "${type}"`);
     }
 
@@ -110,7 +113,7 @@ function attachWindowProperties(properties) {
     const props = {};
 
     properties.forEach(prop => {
-        props[prop.name] = { value: prop, writable:false }
+        props[prop.name] = { value: prop, writable: false }
     });
 
     Object.defineProperties(window, props);
@@ -179,15 +182,15 @@ function throttle(func, limit) {
     let lastFunc;
     let lastRan;
 
-    return function() {
+    return function () {
         const context = this, args = arguments;
-        if(!lastRan) {
+        if (!lastRan) {
             func.apply(context, args);
             lastRan = Date.now();
         } else {
             clearTimeout(lastFunc);
             lastFunc = setTimeOut(() => {
-                if((Date.now() - lastRan) >= limit) {
+                if ((Date.now() - lastRan) >= limit) {
                     func.apply(context, args);
                     lastRan = Date.now();
                 }
@@ -205,7 +208,7 @@ function throttle(func, limit) {
  */
 function debounce(func, delay) {
     let timer;
-    return function() {
+    return function () {
         clearTimeout(timer);
         timer = setTimeout(() => func.apply(this, arguments), delay);
     };
@@ -233,13 +236,13 @@ function useState(initialValue) {
     return [get, set];
 }
 
-export { 
+export {
     attachWindowProperties,
     attachWindowProperty,
     debounce,
     deleteAllCookies,
     deleteCookie,
-    getCookie, 
+    getCookie,
     isNull,
     isUndefined,
     onDocumentReady,

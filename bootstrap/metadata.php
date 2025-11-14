@@ -4,7 +4,7 @@
 return [
     ['charset' => 'UTF-8'],
     ['name' => 'vierport', 'content' => 'width=device-width, initial-scale=1.0'],
-    ['name' => 'description', 'content' => env('APP_NAME', 'Katya Router Application')],
+    ['name' => 'name', 'content' => env('APP_NAME', 'Katya Router Application')],
     ['name' => 'brand', 'content' => env('APP_BRAND', 'rguezque')],
     ['name' => 'description', 'content' => env('APP_DESCRIPTION', 'Project Skeleton - PHP Framework')],
     ['name' => 'version', 'content' => env('APP_VERSION', '1.0.0')],

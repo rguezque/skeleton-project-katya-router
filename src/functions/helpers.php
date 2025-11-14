@@ -36,8 +36,9 @@ if(!function_exists('i18n')) {
 
 if(!function_exists('resources')) {
     /**
-     * Imprime las etiquetas `<link>` y `<script>` para los recursos especificados relativos a /public/static. 
-     * Si los scripts tienen la extensión .module.js, se les añade el atributo type="module".
+     * Imprime las etiquetas `<link>` y `<script>` para los recursos especificados relativos a 
+     * `/public/static`, o el directorio que se haya definido como 'estático'. 
+     * Si los scripts tienen la extensión `.module.js`, se les añade el atributo `type="module"`.
      * 
      * @param array $styles Array de rutas a hojas de estilo CSS.
      * @param array $scripts Array de rutas a archivos JavaScript.
@@ -94,7 +95,7 @@ if(!function_exists('env')) {
 
 if(!function_exists('metadata')) {
     /**
-     * Genera etiquetas `<meta>` HTML a partir de metadatos globales y adicionales.
+     * Genera multiples etiquetas `<meta>` HTML a partir de metadatos globales (previamente cargados con `App::setMetadata`) y adicionales.
      * 
      * @param array $metadata (Opcional) Un array de arrays asociativos, cada uno representando los atributos de una etiqueta <meta>.
      * @return string Las etiquetas `<meta>` generadas.
@@ -150,13 +151,13 @@ if(!function_exists('sanitize_input')) {
     /**
      * Sanitiza recursivamente un valor o un arreglo de valores.
      *
-     * Aplica el filtro FILTER_SANITIZE_FULL_SPECIAL_CHARS para codificar
+     * Aplica el filtro `FILTER_SANITIZE_FULL_SPECIAL_CHARS` para codificar
      * caracteres especiales HTML y prevenir ataques XSS.
      *
-     * @param mixed $data La variable (string o array) a sanitizar.
-     * @return mixed Los datos sanitizados.
+     * @param string|array $data La variable (string o array) a sanitizar.
+     * @return string|array Los datos sanitizados.
      */
-    function sanitize_input($data) {
+    function sanitize_input(string|array $data): string|array {
         if (is_array($data)) {
             // Si es un arreglo, aplica la función a cada elemento.
             return array_map('sanitize_input', $data);
@@ -176,7 +177,7 @@ if(!function_exists('sanitize_input')) {
 
 if(!function_exists('generate_csrf_token')) {
     /**
-     * Genera el token CSRF, lo guarda en la sesión y lo devuelve.
+     * Genera un token CSRF, lo guarda en la sesión y lo devuelve.
      * Si ya existe un token en la sesión, lo devuelve.
      * 
      * @return string El token CSRF actual.
@@ -209,7 +210,7 @@ if(!function_exists('csrf_field')) {
 
 if(!function_exists('validate_csrf_token')) {
     /**
-     * Valida el token enviado en la solicitud (`$_POST` o `$_GET`) contra el token de la sesión.
+     * Valida el token enviado en la solicitud (`$_POST` o `$_GET`) contra el token guardado en la sesión activa.
      * 
      * @param Parameters $request El objeto de la solicitud. Normalmente `$_POST` (`Request::getBody()`) o `$_GET` (`Request::getQuery()`).
      * @return bool True si el token es válido, false si no lo es o falta.

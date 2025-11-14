@@ -1,8 +1,9 @@
-# Converter-XML *frontend*
+# Skeleton Project for `katya-router`
 
-*Frontend para el sistema de captura y procesado de artículos científicos a XML*
+*Skeleton para proyectos, utilizando katya-router*
 
-
+>[!TIP]
+>Después de clonar este repo elimina la carpeta `.git`; así podrás gestionar desde cero el control de versiones de tu proyecto.
 
 ---
 
@@ -19,6 +20,8 @@
 - [Servidor de prueba](#servidor-de-prueba)
 - [Producción](#producción)
 - [i18n](#i18n)
+- [Ambiente de desarrollo](#ambiente-de-desarrollo)
+- [Helpers](#helpers)
 
 ---
 
@@ -240,3 +243,34 @@ En un archivo de vista se carga la traducción así:
 
 > [!IMPORTANT]
 > Los archivos de idioma que se espera que se detecten automáticamente deben existir obligatoriamente. Para cualquier otro idioma que no se espera ofrecer soporte, el archivo de idioma default también debe existir.
+
+## Ambiente de desarrollo
+
+Para configurar el ambiente de desarrollo y manejo de errores utiliza la clase estática `Environment`. El método `Environment::register` buscará automáticamente la variable de entorno `APP_ENV`, si no existe asignará el entorno `development`; aunque también puedes definir directamente el entorno de desarrollo.
+
+```php
+Environment::register(); // O explicitamente Environment::register('production')
+Environment::setLogPath(dirname(__DIR__) . '/logs');
+```
+
+Para los bloques `try-catch` utiliza `Environment::handleException` en el `catch`, de esta forma los logs se guardarán con información detallada, pero el mensaje mostrado al usuario cambiará dependiendo del entorno de desarrollo; en `development` mostrará todo el *trace string* mientras que en `production` solo mostrará un error `500 Internal Error Server`.
+
+Consulta el [`README.md`](./vendor/rguezque/katya-router/README.md#environment-management) del router para más información.
+
+## Helpers
+
+Los *helpers* son funciones cargadas automáticamente al inicio y que facilitan ciertas tareas específicas:
+
+- `url(string $path)`: Genera la URL completa para un recurso dada su ruta relativa dentro del dominio.
+- `i18n(string $key)`: Obtiene una traducción por su clave. Si no existe, se devuelve el string de la clave. Esta función es un atajo del método `i18n::get` para recuperar traducciones previamente cargadas por la clase `Pressmark\App\Config\i18n`.
+- `env(string $key, mixed $default = null, ?int $cast_to = null)`: Devuelve variables de entorno previamente cargadas en `$_ENV`, si el valor no existe devuelve el valor *default* especificado; opcionalmente se puede enviar un número entero como *flag* para especificar a que tipo de dato castear el valor a devolver. Las *flags* posibles son `CAST_INT`, `CAST_STR`, `CAST_FLOAT`, `CAST_ARRAY`, `CAST_BOOL`, `CAST_OBJECT`. Es un atajo de la función `env()` del router.
+- `resources(array $styles = [], array $scripts = [])`: Imprime las etiquetas `<link>` y `<script>` para los recursos especificados relativos a `/public/static`, o el directorio que se haya definido como 'estático'. Si los scripts tienen la extensión `.module.js`, se les añade el atributo `type="module"`.
+- `metadata(array $metadata = [])`: Genera multiples etiquetas `<meta>` HTML a partir de metadatos globales (previamente cargados con `App::setMetadata`) y adicionales.
+- `metatag(array $attributes = [])`: Genera una etiqueta `<meta>` HTML.
+- `pipe(...$fns)`: Devuelve el resultado de ejecutar una secuencia de funciones en *pipeline* sobre un valor específico. Ej. `pipe('strtolower', 'ucwords', 'trim')('  jOHn dOE  ')` devuelve 'John Doe'.
+- `sanitize_input(string|array $data)`: Sanitiza recursivamente un valor o un arreglo de valores. Aplica el filtro `FILTER_SANITIZE_FULL_SPECIAL_CHARS` para codificar caracteres especiales HTML y prevenir ataques XSS.
+- `generate_csrf_token()`: Genera un token CSRF, lo guarda en la sesión y lo devuelve. Si ya existe un token en la sesión, lo devuelve.
+- `csrf_field()`: Genera el campo input hidden con el token CSRF para el formulario. Ej. `<form><? csrf_field() ?></form>`.
+- `validate_csrf_token(Parameters $request)`: Valida el token enviado en la solicitud (`$_POST` o `$_GET`) contra el token guardado en la sesión activa.
+
+También están disponibles los *helpers* definidos en la libreria de `katya-router`. Consulta el [`README.md`](./vendor/rguezque/katya-router/README.md#helpers) del router.
