@@ -212,12 +212,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rguezque/katya-router.git",
-                "reference": "0a9caf68896d372e219ad28323c2739f0ac69fae"
+                "reference": "104b08b680bafde070bffd845ba9033c17174f86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rguezque/katya-router/zipball/0a9caf68896d372e219ad28323c2739f0ac69fae",
-                "reference": "0a9caf68896d372e219ad28323c2739f0ac69fae",
+                "url": "https://api.github.com/repos/rguezque/katya-router/zipball/104b08b680bafde070bffd845ba9033c17174f86",
+                "reference": "104b08b680bafde070bffd845ba9033c17174f86",
                 "shasum": ""
             },
             "require": {
@@ -257,7 +257,7 @@
                 "issues": "https://github.com/rguezque/katya-router/issues",
                 "source": "https://github.com/rguezque/katya-router/tree/v2.0.0"
             },
-            "time": "2025-10-21T16:47:44+00:00"
+            "time": "2025-11-15T22:04:56+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
