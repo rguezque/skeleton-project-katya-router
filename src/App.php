@@ -29,8 +29,10 @@ class App {
         string $base_path, 
         string $static_dir = '/static', 
         ?CorsConfig $cors_config = null, 
-        ?Services $services = null
+        ?Services $services = null,
+        string $timezone = 'America/Mexico_City'
     ): Katya {
+        date_default_timezone_set($timezone);
         self::setBasePath($base_path);
         self::setBaseUrl();
         self::setStaticDirectory($static_dir);
@@ -194,5 +196,3 @@ class App {
     }
 
 }
-
-?>

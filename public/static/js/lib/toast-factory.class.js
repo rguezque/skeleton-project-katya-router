@@ -1,12 +1,12 @@
 /**
  * Sigue el patrón factory, para crear toasts que se eliminan del DOM al desaparecer de pantalla; utilizando la libreria Boostrap
  */
-class ToastFactory {
+export default class ToastFactory {
     /**
      * Inicializa la creación de toasts
      * 
-     * @param {string} containerId Nombre ID del contenedor de los toast generados (sin el simbolo # inicial)
-     * @param {number} delay Tiempo en milisegundos para desvanecer los toasts, si se omite se asigna por default `5500`
+     * @param {String} containerId Nombre ID del contenedor de los toast generados (sin el simbolo # inicial)
+     * @param {Number} delay Tiempo en milisegundos para desvanecer los toasts, si se omite se asigna por default `5500`
      */
     constructor(containerId, delay = 5500) {
         this.containerId = containerId;
@@ -17,7 +17,7 @@ class ToastFactory {
     /**
      * Crea un toast que se elimina del DOM despues del tiempo de espera especificado al crear la instancia de clase
      * 
-     * @param {Object} options  Objeto JS con definición de argumentos del toast.
+     * @param {Object} options Objeto JS con definición de argumentos del toast.
      * 
      * Donde:
      * - `title`: (Opcional) Define el texto de título del toast.
@@ -59,7 +59,7 @@ class ToastFactory {
         ].join('');
 
         const minimalContent = [
-            '<div class="d-flex">',
+            '<div class="d-flex align-items-start">',
             '<div class="toast-body">',
             options.content,
             '</div>',
@@ -83,18 +83,67 @@ class ToastFactory {
     }
 
     /**
+     * Shortcut para crear un toast de tipo `success`
+     * 
+     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     */
+    success(options) {
+        options.type = 'success';
+        this.create(options);
+    }
+
+    /**
+     * Shortcut para crear un toast de tipo `info`
+     * 
+     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     */
+    info(options) {
+        options.type = 'info';
+        this.create(options);
+    }
+
+    /**
+     * Shortcut para crear un toast de tipo `warning`
+     * 
+     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     */
+    warning(options) {
+        options.type = 'warning';
+        this.create(options);
+    }
+
+    /**
+     * Shortcut para crear un toast de tipo `danger`
+     * 
+     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     */
+    danger(options) {
+        options.type = 'danger';
+        this.create(options);
+    }
+
+    /**
+     * Shortcut para crear un toast de tipo `dark`
+     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     */
+    dark(options) {
+        options.type = 'dark';
+        this.create(options);
+    }
+
+    /**
      * Crea un contenedor para los toasts y lo agrega en el DOM como un `lastChild` de `body`. 
      * Devuelve el objeto creado para permitir asignarle atributos.O bien se puede enviar un 
      * objeto con defnición de atributos a aplicar
      * 
-     * @param {object} attrs Un objeto JS con definición de atributos a aplicar al contenedor de los toasts
+     * @param {Object} attrs Un objeto JS con definición de atributos a aplicar al contenedor de los toasts
      * @returns {HTMLDivElement} El objeto html creado
      */
     createContainer(attrs = {}) {
         const toastContainer = document.createElement('div');
         toastContainer.setAttribute('class', 'toast-container position-fixed bottom-0 end-0 p-3');
         toastContainer.setAttribute('id', this.containerId);
-        if(0 !== Object.keys(attrs).length) {
+        if(0 < Object.keys(attrs).length) {
             for(const [prop, value] of Object.entries(attrs)) {
                 toastContainer.setAttribute(prop, value);
             }
@@ -103,5 +152,3 @@ class ToastFactory {
         return toastContainer;
     }
 }
-
-export default ToastFactory;
