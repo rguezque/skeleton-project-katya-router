@@ -19,7 +19,7 @@ const cookieStorage = Object.freeze({
      * 
      * @param {String} name Nombre de la cookie
      * @param {*} value Valor de la cookie
-     * @param {object} options Opciones de configuración de la cookie
+     * @param {Object} options Opciones de configuración de la cookie
      */
     set: function (name, value, options = {}) {
         options = {
@@ -51,8 +51,8 @@ const cookieStorage = Object.freeze({
      * Función para obtener el valor de una cookie por su nombre
      * 
      * @param {String} name Nombre de la cookie
-     * @param {*} defaultValue Valor default a devolver si no existe la cookie
-     * @returns {*} Valor por defecto si no existe la cookie
+     * @param {*} [defaultValue=null] Valor default a devolver si no existe la cookie
+     * @returns {*} Valor de la cookie
      */
     get: function (name, defaultValue = null) {
         const nameEQ = name + "=";
@@ -117,7 +117,6 @@ const cookieStorage = Object.freeze({
             this.remove(name, '/');
         }
     }
-
 });
 
 /**
@@ -130,10 +129,10 @@ function sizeof(obj) {
     const type = typeof obj;
 
     if (!['object', 'array'].includes(type)) {
-        throw new Error(`The argument must be type "object" javascript, or "array". Catched "${type}"`);
+        throw new Error(`[function:sizeof] The argument must be type "object" javascript, or "array". Catched "${type}"`);
     }
 
-    return 'object' == type ? Object.keys(obj).length : obj.length;
+    return 'object' === type ? Object.keys(obj).length : obj.length;
 }
 
 /**
@@ -164,7 +163,6 @@ function attachWindowProperty(property) {
  * Verifica si un valor es undefined
  * 
  * @param {*} value  El valor a evaluar
- * @description Verifica si un valor es undefined
  * @returns  {Boolean} true si el valor es undefined, false en caso contrario
  */
 function isUndefined(value) {
@@ -185,9 +183,14 @@ function isNull(value) {
  * Devuelve `true` si un valor está vacío, `false` en caso contrario
  * 
  * @param {*} value El valor a evaluar
+ * @param {Boolean} [recursively=false] Solo aplica si el valor es un array. 
+ * Si se define `true` evaluará recursivamente cada elemento de un array. 
+ * De esta forma si un array tiene subarrays vacios se considera todo el 
+ * array vacío, pero si contiene al menos un valor válido el subarray no 
+ * se considera vacío y por ende todo el array no se considerará vacío.
  * @returns {Boolean}
  */
-function isEmpty(value) {
+function isEmpty(value, recursively = false) {
     // Verifica si es null o undefined (los más sencillos)
     if (isNull(value) || isUndefined(value)) {
         return true;
@@ -201,12 +204,18 @@ function isEmpty(value) {
 
     // Verifica si es un array y está vacío
     if (Array.isArray(value)) {
-        return value.length === 0;
+        if(value.length === 0) return true;
+
+        if(recursively) {
+            return value.every(isEmpty);
+        }
+
+        return false;
     }
 
     // Verifica si es un objeto y no tiene propiedades propias
     // NOTA: Esto excluye fechas, regex, etc., que son objetos pero se tratan de otra forma.
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object') {
         // Usa Object.keys para obtener un array de las propiedades del objeto.
         return Object.keys(value).length === 0;
     }
@@ -219,7 +228,6 @@ function isEmpty(value) {
  * Elimina uno o más slashes finales de un string.
  * 
  * @param {String} str El string a limpiar.
- * @description Elimina uno o más slashes finales de un string.
  * @returns {String} El string sin slashes finales.
  */
 function removeTrailingSlashes(str) {
@@ -230,7 +238,6 @@ function removeTrailingSlashes(str) {
  * Elimina uno o más slashes iniciales de un string.
  * 
  * @param {String} str El string a limpiar.
- * @description Elimina uno o más slashes iniciales de un string.
  * @returns {String} El string sin slashes iniciales.
  */
 function removeLeadingSlashes(str) {
@@ -336,7 +343,7 @@ function capitalize(str) {
  * Agrega múltiples nodos hijos a un nodo padre.
  *
  * @param {HTMLElement} parentNode El nodo padre al que se agregarán los hijos.
- * @param {Node[]} childNodesArray Un array de nodos (HTMLElement, Text, etc.) a agregar.
+ * @param {Array<Node>} childNodesArray Un array de nodos (HTMLElement, Text, etc.) a agregar.
  */
 function appendChildren(parentNode, childNodesArray) {
     if (!(parentNode instanceof Node)) {
@@ -364,12 +371,13 @@ function appendChildren(parentNode, childNodesArray) {
     // Agrega el DocumentFragment al nodo padre
     // Esta es una sola operación de inserción en el DOM real.
     parentNode.appendChild(fragment);
-    return true;
 }
 
 /**
  * Copia al clipboard el texto del elemento con el ID especificado
+ * 
  * @param {String} targetId El ID del HTMLElement objetivo
+ * @returns {Promise<void>}
  */
 async function clipboardWriteText(targetId) {
     const content = document.getElementById(targetId);

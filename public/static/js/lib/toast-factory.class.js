@@ -1,154 +1,184 @@
 /**
- * Sigue el patrón factory, para crear toasts que se eliminan del DOM al desaparecer de pantalla; utilizando la libreria Boostrap
+ * Factory para crear toasts de Bootstrap que se auto-eliminan del DOM.
+ * @class
  */
 export default class ToastFactory {
+    /** @type {String} */
+    #containerId;
+
+    /** @type {Number} */
+    #delay;
+
+    /** @type {Set<String>} */
+    #validTypes;
+
     /**
-     * Inicializa la creación de toasts
-     * 
-     * @param {String} containerId Nombre ID del contenedor de los toast generados (sin el simbolo # inicial)
-     * @param {Number} delay Tiempo en milisegundos para desvanecer los toasts, si se omite se asigna por default `5500`
+     * Inicializa la fábrica de toasts.
+     * @param {String} containerId - ID del contenedor (sin #).
+     * @param {Number} [delay=5500] - Duración en ms antes de ocultar el toast.
      */
     constructor(containerId, delay = 5500) {
-        this.containerId = containerId;
-        this.delay = delay;
-        this.types = ['primary', 'success', 'info', 'warning', 'danger', 'dark'];
+        this.#containerId = containerId;
+        this.#delay = Number.parseInt(delay, 10) || 5500;
+        this.#validTypes = new Set(['primary', 'success', 'info', 'warning', 'danger', 'dark']);
     }
 
     /**
-     * Crea un toast que se elimina del DOM despues del tiempo de espera especificado al crear la instancia de clase
-     * 
-     * @param {Object} options Objeto JS con definición de argumentos del toast.
-     * 
-     * Donde:
-     * - `title`: (Opcional) Define el texto de título del toast.
-     * - `content`: Define el texto de contenido del toast.
-     * - `type`: Es el tipo de toast, `primary`, `success`, `info`, `warning`, `danger`, `dark`.
-     * - `delay`:  Tiempo en milisegundos para desvanecer y eliminar el toast. Solo aplica al toast actual. No modifica el delay global preestablecido.
+     * Crea y muestra un toast.
+     * @param {Object} options - Configuración del toast.
+     * @param {String} [options.title] - Título opcional.
+     * @param {String} options.content - Contenido principal (requerido).
+     * @param {String} [options.type='primary'] - Tipo visual del toast.
+     * @param {Number} [options.delay] - Duración específica para este toast.
+     * @throws {Error} Si `content` no es válido.
      */
-    create(options) {
-        // Si se definió un atributo "title" es un toast completo, si no, se aplica estilos para toast mínimo
-        const withTitle = options.hasOwnProperty('title');
-        // Verifica si tiene el atributo "type", si no, se aplica "primary" por default. 
-        // Si existe pero no es un tipo válido, tambien se asigna "primary" por default.
-        const type = options.hasOwnProperty('type') ? (this.types.includes(options.type) ? options.type : 'primary') : 'primary';
-        
-        if(!options.hasOwnProperty('content')) {
-            throw new Error('Argumentos insuficientes. No se definió la clave "content" con el mensaje del toast.');
+    create({ title = '', content, type = 'primary', delay = this.#delay } = {}) {
+        if (typeof content !== 'string' || content.trim() === '') {
+            throw new Error('ToastFactory.create(): "content" es requerido y debe ser un string no vacío.');
         }
 
-        const toastContainer = document.getElementById(this.containerId);
-        const toastElement = document.createElement('div');
-        const uuid = crypto.randomUUID();
-        const delay = options.delay || this.delay || 5500;
-    
-        toastElement.classList.add('toast', `text-bg-${type}`, 'z-index-9999');
-        toastElement.setAttribute('role', 'alert');
-        toastElement.setAttribute('id', uuid);
-        toastElement.setAttribute('aria-live', 'assertive');
-        toastElement.setAttribute('aria-atomic', 'true');
-        toastElement.setAttribute('data-bs-delay', delay);
-    
-        const fullContent = [
-            '<div class="toast-header">',
-            `<strong class="me-auto">${options.title}</strong>`,
-            '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>',
-            '</div>',
-            '<div class="toast-body">',
-            options.content,
-            '</div>',
-        ].join('');
+        const toastType = this.#sanitizeType(type);
+        const toastDelay = Number.parseInt(delay, 10) || this.#delay;
+        const withTitle = title.trim() !== '';
 
-        const minimalContent = [
-            '<div class="d-flex align-items-start">',
-            '<div class="toast-body">',
-            options.content,
-            '</div>',
-            '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>',
-            '</div>',
-        ].join('');
+        const toastElement = this.#buildToastElement(toastType, withTitle, toastDelay);
+        this.#populateToastContent(toastElement, title.trim(), content.trim(), withTitle);
 
-        toastElement.innerHTML = withTitle ? fullContent : minimalContent;
-    
-        toastContainer.append(toastElement);
-    
-        const getToast = document.getElementById(uuid);
-        const toast = new bootstrap.Toast(getToast);
-        toast.show();
-    
-        // Elimina el toast para evitar sobrecarga de apilamiento en el DOM. 
-        // Se agrega medio segundo para dar tiempo al efecto de desvanecimiento que aplica bootstrap.
-        setTimeout(() => {
-            getToast.remove()
-        }, delay+500);
+        const container = this.#getOrCreateContainer();
+        container.appendChild(toastElement);
+
+        this.#showAndAutoRemove(toastElement, toastDelay);
     }
 
     /**
-     * Shortcut para crear un toast de tipo `success`
-     * 
-     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     * Valida y normaliza el tipo de toast.
+     * @param {String} type - Tipo propuesto.
+     * @returns {String} Tipo válido o 'primary' por defecto.
      */
-    success(options) {
-        options.type = 'success';
-        this.create(options);
+    #sanitizeType(type) {
+        const normalized = String(type).trim().toLowerCase();
+        return this.#validTypes.has(normalized) ? normalized : 'primary';
     }
 
     /**
-     * Shortcut para crear un toast de tipo `info`
-     * 
-     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     * Crea la estructura base del elemento toast.
+     * @param {String} type - Tipo visual.
+     * @param {Boolean} withTitle - Si incluye header.
+     * @param {Number} delay - Duración en ms.
+     * @returns {HTMLDivElement}
      */
-    info(options) {
-        options.type = 'info';
-        this.create(options);
+    #buildToastElement(type, withTitle, delay) {
+        const el = document.createElement('div');
+        el.className = `toast text-bg-${type} z-index-9999`;
+        el.setAttribute('role', 'alert');
+        el.setAttribute('aria-live', 'assertive');
+        el.setAttribute('aria-atomic', 'true');
+        el.dataset.bsDelay = delay;
+        return el;
     }
 
     /**
-     * Shortcut para crear un toast de tipo `warning`
-     * 
-     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     * Inserta el contenido de forma segura (previene XSS).
+     * @param {HTMLDivElement} toastElement 
+     * @param {String} title 
+     * @param {String} content 
+     * @param {Boolean} withTitle 
      */
-    warning(options) {
-        options.type = 'warning';
-        this.create(options);
+    #populateToastContent(toastElement, title, content, withTitle) {
+        if (withTitle) {
+            const header = document.createElement('div');
+            header.className = 'toast-header';
+            
+            const strong = document.createElement('strong');
+            strong.className = 'me-auto';
+            strong.textContent = title;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'btn-close';
+            closeBtn.dataset.bsDismiss = 'toast';
+            closeBtn.setAttribute('aria-label', 'Close');
+            
+            header.appendChild(strong);
+            header.appendChild(closeBtn);
+            toastElement.appendChild(header);
+        } else {
+            toastElement.classList.add('d-flex', 'align-items-start');
+        }
+
+        const body = document.createElement('div');
+        body.className = 'toast-body';
+        body.textContent = content;
+        
+        if (!withTitle) {
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'btn-close btn-close-white me-2 m-auto';
+            closeBtn.dataset.bsDismiss = 'toast';
+            closeBtn.setAttribute('aria-label', 'Close');
+            toastElement.appendChild(body);
+            toastElement.appendChild(closeBtn);
+        } else {
+            toastElement.appendChild(body);
+        }
     }
 
     /**
-     * Shortcut para crear un toast de tipo `danger`
-     * 
-     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     * Obtiene o crea el contenedor de toasts.
+     * @returns {HTMLDivElement}
      */
-    danger(options) {
-        options.type = 'danger';
-        this.create(options);
+    #getOrCreateContainer() {
+        let container = document.getElementById(this.#containerId);
+        if (!container) {
+            container = this.createContainer();
+        }
+        return container;
     }
 
     /**
-     * Shortcut para crear un toast de tipo `dark`
-     * @param {Object} options Objeto JS con definición de argumentos del toast.
+     * Muestra el toast y lo elimina automáticamente tras la animación.
+     * @param {HTMLDivElement} element 
+     * @param {Number} delay 
      */
-    dark(options) {
-        options.type = 'dark';
-        this.create(options);
+    #showAndAutoRemove(element, delay) {
+        const bsToast = new bootstrap.Toast(element, { delay });
+        bsToast.show();
+        element.addEventListener('hidden.bs.toast', () => element.remove(), { once: true });
     }
 
     /**
-     * Crea un contenedor para los toasts y lo agrega en el DOM como un `lastChild` de `body`. 
-     * Devuelve el objeto creado para permitir asignarle atributos.O bien se puede enviar un 
-     * objeto con defnición de atributos a aplicar
-     * 
-     * @param {Object} attrs Un objeto JS con definición de atributos a aplicar al contenedor de los toasts
-     * @returns {HTMLDivElement} El objeto html creado
+     * Crea y agrega el contenedor de toasts al DOM si no existe.
+     * @param {Record<String, String>} [attrs] - Atributos adicionales.
+     * @returns {HTMLDivElement}
      */
     createContainer(attrs = {}) {
-        const toastContainer = document.createElement('div');
-        toastContainer.setAttribute('class', 'toast-container position-fixed bottom-0 end-0 p-3');
-        toastContainer.setAttribute('id', this.containerId);
-        if(0 < Object.keys(attrs).length) {
-            for(const [prop, value] of Object.entries(attrs)) {
-                toastContainer.setAttribute(prop, value);
-            }
+        let container = document.getElementById(this.#containerId);
+        if (container) return container;
+
+        container = document.createElement('div');
+        container.id = this.#containerId;
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+
+        for (const [key, value] of Object.entries(attrs)) {
+            container.setAttribute(key, value);
         }
-        document.body.appendChild(toastContainer);
-        return toastContainer;
+
+        document.body.appendChild(container);
+        return container;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     *  BLOQUE DE INICIALIZACIÓN ESTÁTICO (ES2022)
+     *  Genera dinámicamente los métodos shortcut dentro de la clase
+     * ───────────────────────────────────────────────────────────── */
+    static {
+        const shortcutTypes = ['success', 'info', 'warning', 'danger', 'dark'];
+        
+        for (const type of shortcutTypes) {
+            // `this` aquí se refiere a la clase ToastFactory
+            this.prototype[type] = function(options = {}) {
+                return this.create({ ...options, type });
+            };
+        }
     }
 }
