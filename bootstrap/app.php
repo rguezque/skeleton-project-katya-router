@@ -5,8 +5,6 @@ use Project\Core\App;
 use Project\Core\VisitorsLogger;
 use rguezque\Environment;
 
-date_default_timezone_set('America/Mexico_City');
-
 // Manejo de errores
 // Para los bloques `try-catch` utiliza `Environment::handleException` en el `catch`
 Environment::register();

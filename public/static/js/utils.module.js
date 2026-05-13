@@ -225,6 +225,16 @@ function isEmpty(value, recursively = false) {
 }
 
 /**
+ * Devuelve `true` si un argumento es un `string`; `false` en caso contrario
+ *
+ * @param {*} arg El argumento a ser evaluado
+ * @returns {Boolean}
+ */
+function isString(arg) {
+    return typeof arg === "string" || arg instanceof String;
+}
+
+/**
  * Elimina uno o más slashes finales de un string.
  * 
  * @param {String} str El string a limpiar.
@@ -440,6 +450,68 @@ function focusOnFirst(form) {
     }
 }
 
+/**
+ * Realiza una petición fetch con timeout configurable
+ *
+ * @param {string} url - Endpoint
+ * @param {object} options - Opciones nativas de fetch
+ * @param {number} timeout - Milisegundos antes de cancelar (default: 5000)
+ * @param {'json'|'text'|'blob'|'arrayBuffer'|'formData'} [responseType='json'] - Tipo de respuesta esperado
+ * @returns {Promise<any>} Datos parseados como el tipo especificado por `responseType`
+ */
+async function fetchWithTimeout(
+    url,
+    options = {},
+    timeout = 5000,
+    responseType = "json",
+) {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    // Programar la cancelación automática
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    // Mapa seguro de parsers soportados por la API Response
+    const parsers = {
+        json: (res) => res.json(),
+        text: (res) => res.text(),
+        blob: (res) => res.blob(),
+        arrayBuffer: (res) => res.arrayBuffer(),
+        formData: (res) => res.formData(),
+    };
+
+    // Validación rápida para fallar en tiempo de desarrollo
+    if (!parsers[responseType]) {
+        throw new TypeError(
+            `responseType inválido: "${responseType}". Usa: ${Object.keys(parsers).join(", ")}`,
+        );
+    }
+
+    try {
+        const response = await fetch(url, { ...options, signal });
+
+        if (!response.ok) {
+            //throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            // Opcional: leer el cuerpo del error si la API lo devuelve
+            const errorBody = await response.text().catch(() => "Sin detalles");
+            throw new Error(
+                `HTTP ${response.status} - ${response.statusText}. ${errorBody}`,
+            );
+        }
+
+        // Parsea la respuesta según el tipo solicitado .text(), .blob(), etc.
+        return await parsers[responseType](response);
+    } catch (error) {
+        if (error.name === "AbortError") {
+            throw new Error(`Tiempo de espera agotado (${timeout}ms)`);
+        }
+        throw error; // Re-lanzar errores de red, JSON inválido, etc.
+    } finally {
+        // Limpiar siempre el timer para evitar memory leaks
+        clearTimeout(timeoutId);
+    }
+}
+
 export {
     appendChildren,
     attachWindowProperties,
@@ -448,10 +520,12 @@ export {
     clipboardWriteText,
     cookieStorage,
     debounce,
+    fetchWithTimeout,
     focusOnFirst,
     humanReadableDate,
     isEmpty,
     isNull,
+    isString,
     isUndefined,
     onDocumentReady,
     pipe,
